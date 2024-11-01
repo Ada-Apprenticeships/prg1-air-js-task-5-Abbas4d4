@@ -121,9 +121,59 @@ function main(){
 }
 
 // Placeholder function to calculate the profit for each flight
-function calculateProfit(){
-    return 0;
+function calculateProfit(flightData, airports, aircrafts){
+    const {UK_airport, Overseas_airport,Type_of_aircraft,
+        Number_of_economy_seats_booked,Number_of_business_seats_booked,
+        Number_of_first_class_seats_booked,Price_of_economy_class_seat,
+        Price_of_business_class_seat, Price_of_first_class_seat,
+    } = flightData;
+
+    const aircraft = aircrafts[Type_of_aircraft];
+    const airport = airports[Overseas_airport];
+
+
+
+    // Validates airport and aircraft vvv
+
+    if (!airport || !aircraft) {
+    // error message console if either airport or aircraft data is missing
+    // JSON.stringify(flightData) converts the flightData object into a JSON string format,
+    // easier to read and understand the contents of the object in the error message.
+        console.error(`Invalid airport or aircraft for flight data: ${JSON.stringify(flightData)}`);
+        return 0;
+    }
+
+    // Calculate total income
+    const income = (Number_of_economy_seats_booked * Price_of_economy_class_seat) +
+                   (Number_of_business_seats_booked * Price_of_business_class_seat) +
+                   (Number_of_first_class_seats_booked * Price_of_first_class_seat);
+
+    // Log income calculation
+    console.log(`Income calculated for flight from ${UK_airport} to ${Overseas_airport}: £${income}`);
+
+    // Total seats booked
+    const totalSeatsBooked = Number_of_economy_seats_booked + Number_of_business_seats_booked + Number_of_first_class_seats_booked;
+
+    // Check for overbooking
+    if (totalSeatsBooked > aircraft.totalSeats) {
+        console.error(`Overbooking detected for flight: ${JSON.stringify(flightData)}`);
+        return 0;
+    }
+
+    // Calculate total cost
+    const distance = airport.distanceFromMAN || airport.distanceFromLGW; // Use the relevant distance
+    const costPerSeat = (aircraft.runningCost / 100) * distance; // Cost per seat for the flight
+    const totalCost = costPerSeat * totalSeatsBooked; // Total cost for all seats
+
+    // Log cost calculation
+    console.log(`Total cost calculated for flight from ${UK_airport} to ${Overseas_airport}: £${totalCost}`);
+
+    // Calculate profit
+    const profit = income - totalCost;
+    console.log(`Profit for flight from ${UK_airport} to ${Overseas_airport}: £${profit.toFixed(2)}`); // Log profit
+    return parseFloat(profit.toFixed(2)); // Round to 2 decimal places
 }
+
 
 // Execute the main function to start the program
 main();
